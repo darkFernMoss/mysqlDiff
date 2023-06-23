@@ -1,10 +1,11 @@
 # mysqlDiff
 
-[English](./README.md) | [中文](./README-zh.md)
+
+                                                         [English](./README.md) | [中文](./README-zh.md)
 
 
 
-**This is a tool that compares the differences between two databases and generates updated SQL statement scripts. **
+**This is a tool that compares the differences between two databases and generates updated SQL statement scripts.**
 
 
 
