@@ -84,6 +84,8 @@ func getIndexes(db *sql.DB, tbName string) (ans []Index, err error) {
 			&index.IndexType,
 			&index.Comment,
 			&index.IndexComment,
+			&index.Visible,
+			&index.Expression,
 		)
 		if err != nil {
 			logrus.WithError(err).Errorln("fail to get index from db")
