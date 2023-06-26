@@ -1,4 +1,4 @@
-package main
+package sqlDiff_mysql8_0_32
 
 import (
 	"database/sql"
@@ -132,6 +132,7 @@ func getCreateTables() (ans []string) {
 					logrus.WithError(err).Errorln("fail to get create table sql")
 					continue
 				}
+
 				ans = append(ans, createTableSql)
 			}
 		}

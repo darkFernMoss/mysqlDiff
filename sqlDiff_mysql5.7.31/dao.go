@@ -1,4 +1,4 @@
-package main
+package sqlDiff_mysql5_7_31
 
 import (
 	"database/sql"
@@ -6,7 +6,15 @@ import (
 )
 
 func getColumnsComments(db *sql.DB, tableName string) (ans map[string]string, err error) {
-	rows, err := db.Query("SELECT COLUMN_NAME, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?", tableName)
+	row, err := db.Query("select database()")
+	if err != nil {
+		return
+	}
+	var schema_name string
+	for row.Next() {
+		row.Scan(&schema_name)
+	}
+	rows, err := db.Query("SELECT COLUMN_NAME, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND TABLE_SCHEMA= ?", tableName, schema_name)
 	if err != nil {
 		return nil, err
 	}
@@ -130,6 +138,7 @@ func getCreateTables() (ans []string) {
 					logrus.WithError(err).Errorln("fail to get create table sql")
 					continue
 				}
+
 				ans = append(ans, createTableSql)
 			}
 		}

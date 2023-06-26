@@ -1,14 +1,25 @@
-package main
+package sqlDiff_mysql5_7_31
 
 func defaultEqual(d1, d2 interface{}) bool {
 	if d1 == nil && d2 == nil {
 		return true
 	}
-	if d1 == nil && d2 != nil || d1 != nil && d2 == nil {
+	var bts1 []byte
+	var bts2 []byte
+	if d1 == nil {
+		bts2 = d2.([]byte)
+		if len(bts2) == 0 {
+			return true
+		}
 		return false
 	}
-	bts1 := d1.([]byte)
-	bts2 := d2.([]byte)
+	if d2 == nil {
+		bts1 = d1.([]byte)
+		if len(bts1) == 0 {
+			return true
+		}
+		return false
+	}
 	return string(bts1) == string(bts2)
 }
 

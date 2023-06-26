@@ -85,7 +85,7 @@ func printDbDiff() {
 	var dbDiff []string
 	for _, table := range targetTables {
 		if !tableExists(sourceTables, table) {
-			dbDiff = append(dbDiff, fmt.Sprintf("DROP TABLE %s;", table))
+			dbDiff = append(dbDiff, fmt.Sprintf("DROP TABLE %s", table))
 		}
 	}
 	createTableSql := getCreateTables()
@@ -152,10 +152,13 @@ func printSqlDiff(tableName string) {
 func printResult(columnDiff []string, indexDiff []string, tableName string) {
 	if len(columnDiff) > 0 {
 		ddlStatement := fmt.Sprintf("ALTER TABLE %s\n%s", tableName, joinStrings(columnDiff, ",\n"))
-		fmt.Printf("#The sql statement corresponding to the change of table %s ：\n%s;\n", tableName, ddlStatement)
+		fmt.Printf("#The sql statement corresponding to the change of table %s :\n%s;\n", tableName, ddlStatement)
 		fmt.Println()
 		fmt.Println()
-		fmt.Printf("#Index update statement for table %s：\n", tableName)
+	}
+
+	if len(indexDiff) > 0 {
+		fmt.Printf("#Index update statement for table %s:\n", tableName)
 		for _, idxStatement := range indexDiff {
 			fmt.Println(idxStatement)
 		}
@@ -180,7 +183,7 @@ func addIndex(sIndexes []Index, tIndexes []Index, indexDiff *[]string) {
 func dropIndex(sIndexes []Index, tIndexes []Index, indexDiff *[]string) {
 	for _, tIdx := range tIndexes {
 		if !indexExists(&sIndexes, tIdx.KeyName) {
-			sqlStr := fmt.Sprintf("DROP INDEX %s;", tIdx.KeyName)
+			sqlStr := fmt.Sprintf("DROP INDEX %s ON %s;", tIdx.KeyName, tIdx.Table)
 			*indexDiff = append(*indexDiff, sqlStr)
 		}
 	}
@@ -190,8 +193,8 @@ func modifyColumn(targetColumns []*Column, sourceColumns []*Column, sComments ma
 	for _, tclm := range targetColumns {
 		for _, sclm := range sourceColumns {
 			if tclm.Field == sclm.Field {
-				if tclm.Type != sclm.Type || tclm.Null != sclm.Null || tclm.Key != sclm.Key ||
-					!defaultEqual(tclm.Default, sclm.Default) || sclm.Extra != tclm.Extra || !commentEqual(sComments, tComments, sclm.Field, tclm.Field) {
+				if tclm.Type != sclm.Type || tclm.Null != sclm.Null || tclm.Key != sclm.Key || !defaultEqual(tclm.Default, sclm.Default) || sclm.Extra != tclm.Extra || !commentEqual(sComments, tComments, sclm.Field, tclm.Field) {
+					//fmt.Println(tclm.Type != sclm.Type, tclm.Null != sclm.Null, tclm.Key != sclm.Key, !defaultEqual(tclm.Default, sclm.Default), sclm.Extra != tclm.Extra, !commentEqual(sComments, tComments, sclm.Field, tclm.Field))
 					sqlStr := fmt.Sprintf("MODIFY COLUMN %s %s", sclm.Field, sclm.Type)
 					if sclm.Null == "NO" {
 						sqlStr += " NOT NULL"
@@ -251,7 +254,9 @@ func addColumn(sourceColumns []*Column, targetColumns []*Column, sComments map[s
 			}
 			if clm.Default != nil {
 				bts := clm.Default.([]byte)
-				addColumn += " DEFAULT" + string(bts)
+				if len(bts) > 0 {
+					addColumn += " DEFAULT " + string(bts)
+				}
 			}
 			if len(clm.Extra) != 0 && clm.Extra == "AUTO_INCREMENT" {
 				addColumn += " " + clm.Extra

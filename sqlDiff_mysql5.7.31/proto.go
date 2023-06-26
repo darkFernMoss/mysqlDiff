@@ -1,4 +1,4 @@
-package main
+package sqlDiff_mysql5_7_31
 
 type Column struct {
 	Field   string
