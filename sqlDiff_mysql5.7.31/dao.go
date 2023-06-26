@@ -10,11 +10,11 @@ func getColumnsComments(db *sql.DB, tableName string) (ans map[string]string, er
 	if err != nil {
 		return
 	}
-	var schema_name string
+	var schemaName string
 	for row.Next() {
-		row.Scan(&schema_name)
+		row.Scan(&schemaName)
 	}
-	rows, err := db.Query("SELECT COLUMN_NAME, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND TABLE_SCHEMA= ?", tableName, schema_name)
+	rows, err := db.Query("SELECT COLUMN_NAME, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND TABLE_SCHEMA= ?", tableName, schemaName)
 	if err != nil {
 		return nil, err
 	}
