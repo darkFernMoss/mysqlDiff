@@ -1,4 +1,4 @@
-package sqlDiff_mysql5_7_31
+package main
 
 import (
 	"database/sql"

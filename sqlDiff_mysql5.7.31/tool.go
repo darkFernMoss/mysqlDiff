@@ -1,4 +1,4 @@
-package sqlDiff_mysql5_7_31
+package main
 
 func defaultEqual(d1, d2 interface{}) bool {
 	if d1 == nil && d2 == nil {
