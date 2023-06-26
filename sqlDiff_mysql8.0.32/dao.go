@@ -6,7 +6,15 @@ import (
 )
 
 func getColumnsComments(db *sql.DB, tableName string) (ans map[string]string, err error) {
-	rows, err := db.Query("SELECT COLUMN_NAME, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?", tableName)
+	row, err := db.Query("select database()")
+	if err != nil {
+		return
+	}
+	var schemaName string
+	for row.Next() {
+		row.Scan(&schemaName)
+	}
+	rows, err := db.Query("SELECT COLUMN_NAME, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND TABLE_SCHEMA= ?", tableName, schemaName)
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +84,6 @@ func getIndexes(db *sql.DB, tbName string) (ans []Index, err error) {
 			&index.IndexType,
 			&index.Comment,
 			&index.IndexComment,
-			&index.Visible,
-			&index.Expression,
 		)
 		if err != nil {
 			logrus.WithError(err).Errorln("fail to get index from db")

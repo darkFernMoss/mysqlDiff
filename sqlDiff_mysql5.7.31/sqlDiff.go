@@ -194,15 +194,6 @@ func modifyColumn(targetColumns []*Column, sourceColumns []*Column, sComments ma
 		for _, sclm := range sourceColumns {
 			if tclm.Field == sclm.Field {
 				if tclm.Type != sclm.Type || tclm.Null != sclm.Null || tclm.Key != sclm.Key || !defaultEqual(tclm.Default, sclm.Default) || sclm.Extra != tclm.Extra || !commentEqual(sComments, tComments, sclm.Field, tclm.Field) {
-					fmt.Println(tclm.Type != sclm.Type, tclm.Null != sclm.Null, tclm.Key != sclm.Key, !defaultEqual(tclm.Default, sclm.Default), sclm.Extra != tclm.Extra, !commentEqual(sComments, tComments, sclm.Field, tclm.Field))
-					fmt.Println(tComments[tclm.Field])
-					fmt.Println(sComments[sclm.Field])
-					rows, _ := sourceDB.Query("select database()")
-					for rows.Next() {
-						var name string
-						rows.Scan(&name)
-						fmt.Println(name)
-					}
 					sqlStr := fmt.Sprintf("MODIFY COLUMN %s %s", sclm.Field, sclm.Type)
 					if sclm.Null == "NO" {
 						sqlStr += " NOT NULL"
